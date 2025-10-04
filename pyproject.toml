@@ -1,0 +1,83 @@
+[build-system]
+requires = ["setuptools>=69", "setuptools-scm>=8", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "marketlens"
+dynamic = ["version"]
+description = "Local-first, PyQt6 stock analysis platform"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "GPL-3.0-only" }
+authors = [{ name = "MarketLens contributors" }]
+dependencies = [
+  "pyqt6>=6.6",
+  "pandas>=2.2",
+  "numpy>=1.26",
+  "apscheduler>=3.10",
+  "duckdb>=1.0",
+  "psycopg[binary]>=3.2",
+  "pydantic>=2.7",
+  "pydantic-settings>=2.3",
+  "platformdirs>=4.2",
+  "pyyaml>=6.0",
+  "typer>=0.12",
+  "rich>=13.7",
+  "ruff>=0.6",              # used via pre-commit, also callable
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2",
+  "pytest-cov>=5.0",
+  "hypothesis>=6.112",
+  "mypy>=1.11",
+  "types-PyYAML",
+  "pre-commit>=4.0",
+  "pip-tools; sys_platform != 'win32'",
+  "testcontainers[postgresql]>=4.8",
+]
+docs = [
+  "mkdocs-material>=9.5",
+  "mkdocstrings[python]>=0.25",
+]
+
+[project.scripts]
+marketlens = "marketlens.cli:app"          # `marketlens` CLI entrypoint
+
+[tool.setuptools_scm]
+version_scheme = "post-release"
+local_scheme = "no-local-version"
+fallback_version = "0.0.0"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+select = ["E","F","I","B","UP","ANN","ASYNC","RUF"]
+ignore = ["ANN101","ANN102"]               # ignore self/cls annotations if you wish
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unused_configs = true
+ignore_missing_imports = true              # relax for vendor libs; tighten gradually
+exclude = ["tests/"]                       # or type them too later
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-q --cov=marketlens --cov-report=term-missing"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["marketlens"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.package-data]
+marketlens = ["py.typed"]
